@@ -11,7 +11,7 @@ class Game:
         pygame.init()
         pygame.display.set_caption("hello world")
         self.window = pygame.display.set_mode((self.screen_width, self.screen_height))
-        self.font = pygame.font.SysFont('consolas', 24)
+        self.font = pygame.font.SysFont('calibri', 24)
 
 
     def draw(self):
@@ -60,6 +60,8 @@ class Game:
             grid.place_object(grid.width - 2, i, Wall())
 
         grid.place_object(4, 4, Player())
+        grid.place_object(8, 12, KeyDoor("small_key"))
+        grid.place_object(10, 7, SmallKey())
 
 
 

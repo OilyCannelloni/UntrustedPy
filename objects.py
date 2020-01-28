@@ -10,11 +10,11 @@ class Object:
         grid.id_counter += 1
         self.coords = (None, None)
         self.name = None
-
+        self.stacked = None
+        self.replacable = False
 
     def behavior(self, keys_down):
         pass
-
 
     def get_coords(self):
         for x in range(grid.width):
@@ -25,7 +25,6 @@ class Object:
                 if obj.id == self.id:
                     return x, y
 
-
     def get_adjacent(self):
         self.coords = self.get_coords()
         return {
@@ -35,13 +34,19 @@ class Object:
             'up': (self.coords[0], self.coords[1]-1)
         }
 
-
     def move(self, d):
         dest = grid.get(self.get_adjacent()[d])
+        dest.on_collision_with(self)
         if dest.passable_for == 'all' or self.name in dest.passable_for:
             grid.move(*self.coords, d)
         else:
             print("cant move")
+
+    def has(self, item):
+        pass
+
+    def on_collision_with(self, collider):
+        pass
 
 
 class Empty(Object):
@@ -52,9 +57,7 @@ class Empty(Object):
         self.passable_for = 'all'
         self.symbol = " "
         self.color = (255, 255, 255)
-
-    def behavior(self, keys_down):
-        pass
+        self.replacable = True
 
 
 class Player(Object):
@@ -64,6 +67,20 @@ class Player(Object):
         self.type = 'player'
         self.symbol = '@'
         self.color = (0, 255, 100)
+        self.inventory = []
+        self.max_inventory_size = 3
+        self.stacked = Empty()
+
+    def push_inventory(self, item):
+        if len(self.inventory) < self.max_inventory_size:
+            self.inventory.append(item)
+            return True
+        else:
+            print("inventory full!")
+            return False
+
+    def has(self, item):
+        return item in [it.name for it in self.inventory]
 
     def behavior(self, key):
         if key == keys.LEFT:
@@ -76,6 +93,7 @@ class Player(Object):
             self.move("up")
 
 
+
 class Wall(Object):
     def __init__(self):
         super().__init__()
@@ -84,3 +102,40 @@ class Wall(Object):
         self.symbol = '#'
         self.color = (255, 255, 255)
         self.passable_for = []
+
+
+class KeyDoor(Object):
+    def __init__(self, key_name):
+        super().__init__()
+        self.name = "key_door"
+        self.type = "dynamic"
+        self.symbol = "⌻"
+        self.color = (255, 200, 100)
+        self.passable_for = []
+        self.required_key_name = key_name
+
+    def on_collision_with(self, collider):
+        if collider.name == "player" and collider.has(self.required_key_name):
+            self.passable_for.append("player")
+        else:
+            self.passable_for = []
+
+
+class SmallKey(Object):
+    def __init__(self):
+        super().__init__()
+        self.name = "small_key"
+        self.type = "item"
+        self.symbol = 'ۿ'
+        self.color = (255, 50, 50)
+        self.passable_for = "all"
+
+    def on_collision_with(self, collider):
+        if collider.name == "player":
+            if grid.get_player().push_inventory(self):
+                grid.place_object_f(*self.get_coords(), Empty())
+
+
+
+
+

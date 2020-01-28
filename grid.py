@@ -29,29 +29,39 @@ class Grid:
         self.grid[x1][y1] = temp
 
 
+    def push(self, x1, y1, x2, y2):
+        new_stack = self.grid[x2][y2]
+        self.grid[x2][y2] = self.grid[x1][y1]
+        self.grid[x1][y1] = self.grid[x1][y1].stacked
+        self.grid[x2][y2].stacked = new_stack
+
+
     def move(self, x, y, d):
         if d == "right":
             if x+1 > self.width:
                 return False
-            self.swap(x, y, x+1, y)
+            self.push(x, y, x+1, y)
         elif d == "up":
             if y-1 < 0:
                 return False
-            self.swap(x, y, x, y-1)
+            self.push(x, y, x, y-1)
         elif d == "down":
             if y+1 > self.height:
                 return False
-            self.swap(x, y, x, y+1)
+            self.push(x, y, x, y+1)
         elif d == "left":
             if x-1 < 0:
                 return False
-            self.swap(x, y, x-1, y)
+            self.push(x, y, x-1, y)
 
 
-    def place_object(self, x, y, obj=None):
-        if obj is not None:
+    def place_object(self, x, y, obj):
+        if self.grid[x][y] is None or self.grid[x][y].replacable:
             self.grid[x][y] = obj
 
+
+    def place_object_f(self, x, y, obj):
+        self.grid[x][y] = obj
 
     def get_player(self):
         for col in self.grid:
