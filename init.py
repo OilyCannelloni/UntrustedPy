@@ -1,4 +1,5 @@
-from objects import *
+import objects
+from objects import grid
 from constants import CONSOLE_CONFIG
 from libs.pygame_console.game_console import Console
 import pygame
@@ -103,12 +104,18 @@ class Game:
     def clear_grid():
         for x in range(grid.width):
             for y in range(grid.height):
-                grid.place_object(x, y, Empty())
+                grid.place_object(x, y, objects.Empty())
 
+    def place_from_map(self, _map, code):
+        for y, row in enumerate(_map):
+            for x, char in enumerate(row):
+                ref = code[char]
+                obj = objects.__dict__[ref]() if type(ref) == str else ref
+                grid.place_object(x, y, obj)
 
     def level1(self):
         self.clear_grid()
-        grid.place_from_map(("....................",
+        self.place_from_map(("....................",
                              ".##################.",
                              ".#................#.",
                              ".#................#.",
@@ -129,11 +136,11 @@ class Game:
                              ".##################.",
                              "...................."
                              ), {
-            ".": Empty(),
-            "#": Wall(),
-            "p": Player(),
-            "k": SmallKey(),
-            "d": KeyDoor("small_key")
+            ".": 'Empty',
+            "#": 'Wall',
+            "p": 'Player',
+            "k": objects.SmallKey(),
+            "d": objects.KeyDoor("small_key")
         })
 
 

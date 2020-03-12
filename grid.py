@@ -65,7 +65,4 @@ class Grid:
                 if entity.type == 'player':
                     return entity
 
-    def place_from_map(self, _map, code):
-        for y, row in enumerate(_map):
-            for x, char in enumerate(row):
-                self.place_object(x, y, code[char])
+
