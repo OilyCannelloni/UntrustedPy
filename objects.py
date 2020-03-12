@@ -1,7 +1,7 @@
 from constants import keys
 from grid import Grid
 
-grid = Grid(40, 40)
+grid = Grid(30, 30)
 
 
 class Object:
@@ -85,13 +85,12 @@ class Player(Object):
     def behavior(self, key):
         if key == keys.LEFT:
             self.move("right")
-        if key == keys.RIGHT:
+        elif key == keys.RIGHT:
             self.move("left")
-        if key == keys.DOWN:
+        elif key == keys.DOWN:
             self.move("down")
-        if key == keys.UP:
+        elif key == keys.UP:
             self.move("up")
-
 
 
 class Wall(Object):
@@ -126,7 +125,7 @@ class SmallKey(Object):
         super().__init__()
         self.name = "small_key"
         self.type = "item"
-        self.symbol = 'ۿ'
+        self.symbol = 'k'
         self.color = (255, 50, 50)
         self.passable_for = "all"
 

@@ -1,18 +1,16 @@
-import pygame
-
 
 class Grid:
-    def __init__(self, grid_width=10, grid_height=10, screen_width=1000, screen_height=1000):
+    def __init__(self, grid_width=10, grid_height=10):
         self.running = True
 
-        self.field_width = 24
-        self.field_height = 24
+        self.field_width = 20
+        self.field_height = 20
 
         self.width = grid_width
         self.height = grid_height
 
-        self.MARGIN_LEFT = int(self.field_width/2 + 10)
-        self.MARGIN_TOP = int(self.field_height/2 + 10)
+        self.MARGIN_LEFT = int(self.field_width/2 + 5)
+        self.MARGIN_TOP = int(self.field_height/2 + 5)
 
         self.grid = [[None] * self.height for _ in range(self.width)]
 
@@ -54,11 +52,9 @@ class Grid:
                 return False
             self.push(x, y, x-1, y)
 
-
     def place_object(self, x, y, obj):
         if self.grid[x][y] is None or self.grid[x][y].replacable:
             self.grid[x][y] = obj
-
 
     def place_object_f(self, x, y, obj):
         self.grid[x][y] = obj
@@ -69,3 +65,7 @@ class Grid:
                 if entity.type == 'player':
                     return entity
 
+    def place_from_map(self, _map, code):
+        for y, row in enumerate(_map):
+            for x, char in enumerate(row):
+                self.place_object(x, y, code[char])
