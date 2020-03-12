@@ -56,7 +56,7 @@ class Game:
         self.window.blit(self.taskbar_top_surf, (0, 0))
 
     def draw(self):
-        self.font = pygame.font.SysFont('calibri', 20)
+        self.font = pygame.font.SysFont('cambriacambriamath', 20)
         for x in range(grid.width):
             for y in range(grid.height):
                 obj = grid.grid[x][y]

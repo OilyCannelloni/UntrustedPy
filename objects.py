@@ -65,7 +65,7 @@ class Player(Object):
         super().__init__()
         self.name = 'player'
         self.type = 'player'
-        self.symbol = '@'
+        self.symbol = '▲'
         self.color = (0, 255, 100)
         self.inventory = []
         self.max_inventory_size = 3
@@ -85,12 +85,16 @@ class Player(Object):
     def behavior(self, key):
         if key == keys.LEFT:
             self.move("right")
+            self.symbol = "▶"
         elif key == keys.RIGHT:
             self.move("left")
+            self.symbol = "◀"
         elif key == keys.DOWN:
             self.move("down")
+            self.symbol = "▼"
         elif key == keys.UP:
             self.move("up")
+            self.symbol = "▲"
 
 
 class Wall(Object):
