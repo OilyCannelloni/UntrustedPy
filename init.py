@@ -1,4 +1,6 @@
 from objects import *
+from constants import CONSOLE_CONFIG
+from libs.pygame_console.game_console import Console
 import pygame
 
 
@@ -21,7 +23,7 @@ class Game:
         self.game_surf.fill((30, 30, 30))
 
         self.code_surf = pygame.Surface((600, 600))
-        self.code_surf.fill((40, 40, 40))
+        self.code_surf.fill((0, 0, 0))
 
         self.window.blit(self.game_surf, (0, self.top_taskbar_h))
         self.window.blit(self.code_surf, (600, self.top_taskbar_h))
@@ -40,6 +42,8 @@ class Game:
 
         self.level = None
 
+        self.console = Console(grid, 600, CONSOLE_CONFIG)
+        self.console.toggle()
 
     def display_inventory(self, inv_):
         inv = inv_ + [None for _ in range(len(self.item_boxes) - len(inv_))]
@@ -69,11 +73,11 @@ class Game:
 
         self.window.blit(self.game_surf, (0, self.top_taskbar_h))
 
-
     def tick(self, delay):
         pygame.time.delay(delay)
 
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
 
@@ -82,9 +86,16 @@ class Game:
                 p.behavior(event.key)
                 self.display_inventory(p.inventory)
 
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_F1:
+                    self.console.toggle()
+
         self.game_surf.fill((0, 0, 0))
         self.draw()
 
+        self.console.update(events)
+        self.console.show(self.code_surf)
+        self.window.blit(self.code_surf, (600, self.top_taskbar_h))
         pygame.display.update()
 
 
