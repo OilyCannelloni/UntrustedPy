@@ -1,6 +1,7 @@
 import objects
 from objects import grid
-from constants import CONSOLE_CONFIG
+from constants import Colors
+from config import CONSOLE_CONFIG
 from libs.pygame_console.game_console import Console
 import pygame
 
@@ -18,47 +19,28 @@ class Game:
         self.font = pygame.font.SysFont('couriernew', 30)
 
         self.taskbar_top_surf = pygame.Surface((self.screen_width, self.top_taskbar_h))
-        self.taskbar_top_surf.fill((20, 20, 20))
-
+        self.taskbar_top_surf.fill(Colors.MD_GRAY)
         self.game_surf = pygame.Surface((600, 600))
-        self.game_surf.fill((30, 30, 30))
-
+        self.game_surf.fill(Colors.MD_GRAY)
         self.code_surf = pygame.Surface((600, 600))
-        self.code_surf.fill((0, 0, 0))
+        self.code_surf.fill(Colors.BLACK)
 
         self.window.blit(self.game_surf, (0, self.top_taskbar_h))
         self.window.blit(self.code_surf, (600, self.top_taskbar_h))
 
         self.inv_box = pygame.Surface((250, 70))
-        self.inv_box.fill((255, 255, 255))
+        self.inv_box.fill(Colors.WHITE)
         self.item_boxes = [pygame.Surface((50, 50)) for _ in range(4)]
 
         self.display_inventory([None for _ in range(len(self.item_boxes))])
 
         self.taskbar_top_surf.blit(self.inv_box, (30, 70))
-        inv_text = self.font.render("self.inventory", True, (255, 255, 255))
+        inv_text = self.font.render("self.inventory", True, Colors.WHITE)
         self.taskbar_top_surf.blit(inv_text, (30, 30))
-
         self.window.blit(self.taskbar_top_surf, (0, 0))
-
-        self.level = None
 
         self.console = Console(grid, 600, CONSOLE_CONFIG)
         self.console.toggle()
-
-    def display_inventory(self, inv_):
-        inv = inv_ + [None for _ in range(len(self.item_boxes) - len(inv_))]
-        self.font = pygame.font.SysFont('couriernew', 30)
-        self.inv_box.fill((255, 255, 255))
-        for i in range(len(self.item_boxes)):
-            s = inv[i].symbol if inv[i] is not None else "-"
-            c = inv[i].color if inv[i] is not None else (255, 255, 255)
-            sym = self.font.render(s, True, c)
-            self.item_boxes[i].fill((10, 10, 10))
-            self.item_boxes[i].blit(sym, (15, 10))
-            self.inv_box.blit(self.item_boxes[i], (10 + 60 * i, 10))
-        self.taskbar_top_surf.blit(self.inv_box, (30, 70))
-        self.window.blit(self.taskbar_top_surf, (0, 0))
 
     def draw(self):
         self.font = pygame.font.SysFont('cambriacambriamath', 20)
@@ -66,13 +48,41 @@ class Game:
             for y in range(grid.height):
                 obj = grid.grid[x][y]
                 sym = obj.symbol if obj is not None else "."
-                col = obj.color if obj is not None else (255, 100, 0)
+                col = obj.color if obj is not None else Colors.ORANGE
                 char = self.font.render(sym, True, col)
                 char_rect = char.get_rect()
                 char_rect.center = (x*grid.field_width+grid.MARGIN_LEFT, y*grid.field_height+grid.MARGIN_TOP)
                 self.game_surf.blit(char, char_rect)
 
         self.window.blit(self.game_surf, (0, self.top_taskbar_h))
+
+    @staticmethod
+    def clear_grid():
+        for x in range(grid.width):
+            for y in range(grid.height):
+                grid.place_object(x, y, objects.Empty())
+
+    def display_inventory(self, inv_):
+        inv = inv_ + [None for _ in range(len(self.item_boxes) - len(inv_))]
+        self.font = pygame.font.SysFont('couriernew', 30)
+        self.inv_box.fill(Colors.WHITE)
+        for i, box in enumerate(self.item_boxes):
+            s = inv[i].symbol if inv[i] is not None else "-"
+            c = inv[i].color if inv[i] is not None else Colors.WHITE
+            sym = self.font.render(s, True, c)
+            box.fill(Colors.D_GRAY)
+            box.blit(sym, (15, 10))
+            self.inv_box.blit(box, (10 + 60 * i, 10))
+        self.taskbar_top_surf.blit(self.inv_box, (30, 70))
+        self.window.blit(self.taskbar_top_surf, (0, 0))
+
+    @staticmethod
+    def place_from_map(_map, code):
+        for y, row in enumerate(_map):
+            for x, char in enumerate(row):
+                ref = code[char]
+                obj = objects.__dict__[ref]() if type(ref) == str else ref
+                grid.place_object(x, y, obj)
 
     def tick(self, delay):
         pygame.time.delay(delay)
@@ -98,20 +108,6 @@ class Game:
         self.console.show(self.code_surf)
         self.window.blit(self.code_surf, (600, self.top_taskbar_h))
         pygame.display.update()
-
-
-    @staticmethod
-    def clear_grid():
-        for x in range(grid.width):
-            for y in range(grid.height):
-                grid.place_object(x, y, objects.Empty())
-
-    def place_from_map(self, _map, code):
-        for y, row in enumerate(_map):
-            for x, char in enumerate(row):
-                ref = code[char]
-                obj = objects.__dict__[ref]() if type(ref) == str else ref
-                grid.place_object(x, y, obj)
 
     def level1(self):
         self.clear_grid()
