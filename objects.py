@@ -1,5 +1,6 @@
-from constants import keys
+from constants import keys, Events
 from grid import Grid
+import pygame.event
 
 grid = Grid(30, 30)
 
@@ -105,6 +106,35 @@ class Wall(Object):
         self.symbol = '#'
         self.color = (255, 255, 255)
         self.passable_for = []
+
+
+class FluxBarrier(Object):
+    def __init__(self, *items_removed):
+        super().__init__()
+        self.name = "flux_barrier"
+        self.type = "dynamic"
+        self.symbol = "⍂"
+        self.color = (200, 100, 255)
+        self.passable_for = "all"
+        self.items_removed = items_removed
+
+    def on_collision_with(self, collider):
+        collider.inventory = [item for item in collider.inventory if item not in self.items_removed]
+
+
+class Exit(Object):
+    def __init__(self, target_level):
+        super().__init__()
+        self.name = "exit"
+        self.type = "dynamic"
+        self.symbol = "⌼"
+        self.color = (100, 100, 255)
+        self.passable_for = ["player"]
+        self.target_level = target_level
+
+    def on_collision_with(self, collider):
+        if collider.name == "player":
+            pygame.event.post(pygame.event.Event(Events.LEVEL, {"target": self.target_level}))
 
 
 class KeyDoor(Object):

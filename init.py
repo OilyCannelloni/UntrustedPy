@@ -1,6 +1,6 @@
 import objects
 from objects import grid
-from constants import Colors
+from constants import Colors, Events
 from config import CONSOLE_CONFIG
 from libs.pygame_console.game_console import Console
 import pygame
@@ -42,6 +42,7 @@ class Game:
         self.console = Console(grid, 600, CONSOLE_CONFIG)
         self.console.toggle()
 
+
     def draw(self):
         self.font = pygame.font.SysFont('cambriacambriamath', 20)
         for x in range(grid.width):
@@ -60,7 +61,7 @@ class Game:
     def clear_grid():
         for x in range(grid.width):
             for y in range(grid.height):
-                grid.place_object(x, y, objects.Empty())
+                grid.place_object_f(x, y, objects.Empty())
 
     def display_inventory(self, inv_):
         inv = inv_ + [None for _ in range(len(self.item_boxes) - len(inv_))]
@@ -101,6 +102,10 @@ class Game:
                 if event.key == pygame.K_F1:
                     self.console.toggle()
 
+            if event.type == Events.LEVEL:
+                print(event.target)
+                getattr(self, event.target)()
+
         self.game_surf.fill((0, 0, 0))
         self.draw()
 
@@ -123,7 +128,7 @@ class Game:
                              ".#................#.",
                              ".#................#.",
                              ".#................#.",
-                             ".#................#.",
+                             ".#.......e........#.",
                              ".#................#.",
                              ".#................#.",
                              ".#................#.",
@@ -136,7 +141,27 @@ class Game:
             "#": 'Wall',
             "p": 'Player',
             "k": objects.SmallKey(),
-            "d": objects.KeyDoor("small_key")
+            "d": objects.KeyDoor("small_key"),
+            "e": objects.Exit("level2")
+        })
+
+    def level2(self):
+        self.clear_grid()
+        self.place_from_map(("..........",
+                             ".########.",
+                             ".#.p....#.",
+                             ".#....k.#.",
+                             ".###d####.",
+                             ".#......#.",
+                             ".#....e.#.",
+                             ".########.",
+                             ".........."), {
+            ".": 'Empty',
+            "#": 'Wall',
+            "p": 'Player',
+            "k": objects.SmallKey(),
+            "d": objects.KeyDoor("small_key"),
+            "e": objects.Exit("level1")
         })
 
 

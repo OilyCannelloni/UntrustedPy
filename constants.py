@@ -13,4 +13,8 @@ class Colors:
     ORANGE = (255, 100, 0)
 
 
+class Events:
+    LEVEL = 25
+
+
 
