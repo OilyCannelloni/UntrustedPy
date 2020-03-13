@@ -28,6 +28,12 @@ class Grid:
     def get(self, coords):
         return self.grid[coords[0]][coords[1]]
 
+    def find(self, **kwargs):
+        for x, col in enumerate(self.grid):
+            for y, obj in enumerate(col):
+                for k, v in kwargs:
+                    if obj[k] == v:
+                        yield x, y
 
     def swap(self, x1, y1, x2, y2):
         temp = self.grid[x2][y2]

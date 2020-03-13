@@ -220,4 +220,4 @@ class AllyDrone(Object):
                 self.move("down")
 
     def behavior(self, keys_down):
-        self.move_towards(grid.)
+        self.move_towards(grid.find(name="player"))
