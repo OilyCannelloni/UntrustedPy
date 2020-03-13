@@ -6,13 +6,17 @@ grid = Grid(30, 30)
 
 
 class Object:
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.id = grid.id_counter  # A unique id for each object
         grid.id_counter += 1
         self.coords = (None, None)
         self.name = None
         self.stacked = None
         self.replacable = False
+        self.hackable = []
+
+        for arg, val in kwargs.items():
+            setattr(self, arg, val)
 
     def behavior(self, keys_down):
         """
@@ -25,7 +29,6 @@ class Object:
     def get_coords(self):
         """
         Returns coordinates of the object
-        # TODO change this to grid.find()
         :return: (x, y) coordinates of the object
         """
         return grid.find(id=self.id)
