@@ -61,7 +61,7 @@ class Game:
     def clear_grid():
         for x in range(grid.width):
             for y in range(grid.height):
-                grid.place_object_f(x, y, objects.Empty())
+                grid.place_object_f((x, y), objects.Empty())
 
     def display_inventory(self, inv_):
         inv = inv_ + [None for _ in range(len(self.item_boxes) - len(inv_))]
@@ -83,7 +83,7 @@ class Game:
             for x, char in enumerate(row):
                 ref = code[char]
                 obj = objects.__dict__[ref]() if type(ref) == str else ref
-                grid.place_object(x, y, obj)
+                grid.place_object((x, y), obj)
 
     def tick(self, delay):
         pygame.time.delay(delay)
@@ -216,6 +216,6 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.level4()
+    game.level3()
     while game.running:
         game.tick(30)

@@ -40,7 +40,7 @@ class Object:
         self.on_collision_with(dest)
         dest.on_collision_with(self)
         if dest.passable_for == 'all' or self.name in dest.passable_for:
-            grid.move(*self.coords, d)
+            grid.move(self.coords, d)
 
     def has(self, item):
         pass
@@ -195,7 +195,7 @@ class SmallKey(Object):
     def on_collision_with(self, collider):
         if collider.name == "player":
             if grid.get_player().push_inventory(self):
-                grid.place_object_f(*self.get_coords(), Empty())
+                grid.place_object_f(self.get_coords(), Empty())
 
 
 class AllyDrone(Object):
@@ -232,6 +232,6 @@ class AllyDrone(Object):
         if collider.name == "player":
             coords = self.get_coords()
             if len(self.inventory) > 0:
-                grid.place_object_f(*coords, self.inventory[0])
+                grid.place_object_f(coords, self.inventory[0])
             else:
-                grid.place_object_f(*coords, Empty)
+                grid.place_object_f(coords, Empty)

@@ -26,9 +26,22 @@ class Grid:
         self.level = "level1"
 
     def get(self, coords):
+        """
+        Returns the object placed on given coordinates of grid
+        :param coords: (x, y) coordinates of the field
+        :type coords: tuple
+        :return: Object on (x, y) coordinates
+        """
         return self.grid[coords[0]][coords[1]]
 
     def match(self, **kwargs):
+        """
+        Returns coordinates of all objects, that match search conditions.
+        A matching object must have all properties equal to those
+        specified in search conditions.
+        :param kwargs: Search parameters in attribute=value pairs.
+        :return: A list of (x, y) coordinate tuples of matching objects
+        """
         ret = []
         for x, col in enumerate(self.grid):
             for y, obj in enumerate(col):
@@ -37,41 +50,50 @@ class Grid:
                         ret.append((x, y))
         return ret
 
-    def swap(self, x1, y1, x2, y2):
-        temp = self.grid[x2][y2]
-        self.grid[x2][y2] = self.grid[x1][y1]
-        self.grid[x1][y1] = temp
+    def find(self, **kwargs):
+        """
+        Returns the first found object that matches search criteria
+        :param kwargs: Search parameters in attribute=value pairs.
+        :return: (x, y) coordinate tuple of matching object
+        """
+        return self.match(**kwargs)[0]
 
-    def push(self, x1, y1, x2, y2):
-        new_stack = self.grid[x2][y2]
-        self.grid[x2][y2] = self.grid[x1][y1]
-        self.grid[x1][y1] = self.grid[x1][y1].stacked
-        self.grid[x2][y2].stacked = new_stack
+    def swap(self, c1, c2):
+        temp = self.get(c1)
+        self.place_object_f(c1, self.get(c2))
+        self.place_object_f(c2, temp)
 
-    def move(self, x, y, d):
-        if d == "right":
+    def push(self, c1, c2):
+        new_stack = self.get(c2)
+        self.place_object_f(c2, self.get(c1))
+        self.place_object_f(c1, self.get(c1).stacked)
+        self.get(c2).stacked = new_stack
+
+    def move(self, crd, direction):
+        x, y = crd
+        if direction == "right":
             if x+1 > self.width:
                 return False
-            self.push(x, y, x+1, y)
-        elif d == "up":
+            self.push((x, y), (x+1, y))
+        elif direction == "up":
             if y-1 < 0:
                 return False
-            self.push(x, y, x, y-1)
-        elif d == "down":
+            self.push((x, y), (x, y-1))
+        elif direction == "down":
             if y+1 > self.height:
                 return False
-            self.push(x, y, x, y+1)
-        elif d == "left":
+            self.push((x, y), (x, y+1))
+        elif direction == "left":
             if x-1 < 0:
                 return False
-            self.push(x, y, x-1, y)
+            self.push((x, y), (x-1, y))
 
-    def place_object(self, x, y, obj):
-        if self.grid[x][y] is None or self.grid[x][y].replacable:
-            self.grid[x][y] = obj
+    def place_object(self, crd, obj):
+        if self.get(crd) is None or self.get(crd).replacable:
+            self.grid[crd[0]][crd[1]] = obj
 
-    def place_object_f(self, x, y, obj):
-        self.grid[x][y] = obj
+    def place_object_f(self, crd, obj):
+        self.grid[crd[0]][crd[1]] = obj
 
     def get_player(self):
         for col in self.grid:
@@ -84,6 +106,3 @@ class Grid:
             for y, obj in enumerate(col):
                 if obj.type == Type.DYNAMIC:
                     yield x, y
-
-
-
