@@ -47,7 +47,7 @@ class Game:
         self.window.blit(self.taskbar_top_surf, (0, 0))
 
         self.console = Console(grid, 600, CONSOLE_CONFIG)
-        self.console.toggle()
+        # self.console.toggle()
 
     def draw(self):
         """
@@ -146,6 +146,12 @@ class Game:
 
             if event.type == Events.LEVEL:
                 getattr(self, event.target)()
+
+            if event.type == Events.CONSOLE_TOGGLE:
+                if event.on:
+                    self.console.enabled = True
+                else:
+                    self.console.enabled = False
 
         self.game_surf.fill(Colors.BLACK)
         self.draw()
@@ -247,14 +253,34 @@ class Game:
             "#": "Wall",
             "p": "Player",
             "x": objects.ColoredDoor(Colors.ORANGE),
-            "e": objects.Exit("level1"),
+            "e": objects.Exit("level5"),
             "d": objects.AllyDrone(inv=[objects.SmallKey(Colors.ORANGE)]),
             "D": objects.ColoredDoor(Colors.ORANGE)
         })
 
+    def level5(self):
+        self.clear_grid()
+        self.place_from_map(("..........",
+                             ".########.",
+                             ".#p.c...#.",
+                             ".#.....k#.",
+                             ".####d###.",
+                             ".#......#.",
+                             ".#.....e#.",
+                             ".########.",
+                             ".........."), {
+                                ".": 'Empty',
+                                "#": 'Wall',
+                                "p": objects.Player(),
+                                "k": objects.SmallKey(),
+                                "d": objects.KeyDoor("small_key"),
+                                "e": objects.Exit("level1"),
+                                "c": objects.Computer()
+                            })
+
 
 if __name__ == "__main__":
     game = Game()
-    game.level3()
+    game.level1()
     while game.running:
         game.tick(30)

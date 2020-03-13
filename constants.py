@@ -1,8 +1,8 @@
 class Keys:
     UP = 273
     DOWN = 274
-    RIGHT = 276
-    LEFT = 275
+    RIGHT = 275
+    LEFT = 276
 
 
 class Colors:
@@ -23,6 +23,7 @@ class Colors:
 
 class Events:
     LEVEL = 25
+    CONSOLE_TOGGLE = 26
 
 
 class Type:

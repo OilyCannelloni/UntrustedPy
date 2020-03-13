@@ -94,6 +94,7 @@ class Player(Object):
         self.name = 'player'
         self.type = Type.PLAYER
         self.symbol = '▲'
+        self.looking_at = None
         self.color = (0, 255, 100)
         self.inventory = inv if inv is not None else []
         self.max_inventory_size = 3
@@ -117,18 +118,16 @@ class Player(Object):
         return item in [it.name for it in self.inventory]
 
     def behavior(self, key):
-        if key == Keys.LEFT:
-            self.move("right")
-            self.symbol = "▶"
-        elif key == Keys.RIGHT:
-            self.move("left")
-            self.symbol = "◀"
-        elif key == Keys.DOWN:
-            self.move("down")
-            self.symbol = "▼"
-        elif key == Keys.UP:
-            self.move("up")
-            self.symbol = "▲"
+        dirs = {
+            Keys.LEFT: ("left", "◀"),
+            Keys.RIGHT: ("right", "▶"),
+            Keys.UP: ("up", "▲"),
+            Keys.DOWN: ("down", "▼")
+        }
+        if key in dirs.keys():
+            self.move(dirs[key][0])
+            self.symbol = dirs[key][1]
+            self.looking_at = self.get_adjacent()[dirs[key][0]]
 
 
 class Wall(Object):
@@ -273,3 +272,26 @@ class AllyDrone(Object):
                 grid.place_object_f(coords, self.inventory[0])
             else:
                 grid.place_object_f(coords, Empty)
+
+
+class Computer(Object):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.name = "computer"
+        self.type = Type.STATIC
+        self.symbol = "@"
+        self.color = Colors.WHITE
+        self.passable_for = ["player"]
+
+        # Close the console on spawn, as the player has no computer
+        pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": False}))
+
+    def on_collision_with(self, collider):
+        if collider.name == "player":
+            if grid.get_player().push_inventory(self):
+                self.on_pickup()
+                grid.place_object_f(self.get_coords(), Empty())
+
+    @staticmethod
+    def on_pickup():
+        pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": True}))
