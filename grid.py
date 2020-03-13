@@ -28,6 +28,7 @@ class Grid:
     def get(self, coords):
         return self.grid[coords[0]][coords[1]]
 
+
     def swap(self, x1, y1, x2, y2):
         temp = self.grid[x2][y2]
         self.grid[x2][y2] = self.grid[x1][y1]
@@ -69,6 +70,12 @@ class Grid:
             for entity in col:
                 if entity.type == Type.PLAYER:
                     return entity
+
+    def get_dynamic_objects(self):
+        for x, col in enumerate(self.grid):
+            for y, obj in enumerate(col):
+                if obj.type == Type.DYNAMIC:
+                    yield x, y
 
 
 

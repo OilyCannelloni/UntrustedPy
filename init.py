@@ -98,10 +98,8 @@ class Game:
                 p.behavior(event.key)
                 self.display_inventory(p.inventory)
 
-                for col in grid.grid:
-                    for obj in col:
-                        if obj.type == Type.DYNAMIC:
-                            obj.behavior(event.key)
+                for obj_coords in grid.get_dynamic_objects():
+                    grid.get(obj_coords).behavior(event.key)
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_F1:

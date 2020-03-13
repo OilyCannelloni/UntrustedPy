@@ -194,3 +194,30 @@ class SmallKey(Object):
         if collider.name == "player":
             if grid.get_player().push_inventory(self):
                 grid.place_object_f(*self.get_coords(), Empty())
+
+
+class AllyDrone(Object):
+    def __init__(self, inv=None):
+        super().__init__()
+        self.name = "ally_drone"
+        self.type = Type.DYNAMIC
+        self.symbol = "⌘"
+        self.color = Colors.GREEN
+
+    def move_towards(self, dest_coords):
+        coords = self.get_coords()
+        dx = coords[0] - dest_coords[0]
+        dy = coords[1] - dest_coords[1]
+        if abs(dx) > abs(dy):
+            if coords[0] > dest_coords[0]:
+                self.move("left")
+            else:
+                self.move("right")
+        else:
+            if coords[1] > dest_coords[1]:
+                self.move("up")
+            else:
+                self.move("down")
+
+    def behavior(self, keys_down):
+        self.move_towards(grid.)
