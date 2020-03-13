@@ -7,7 +7,14 @@ import pygame
 
 
 class Game:
+    """
+    Main class which manipulates all game events
+    """
     def __init__(self, screen_width=1200, screen_height=900):
+        """
+        :param screen_width: Screen width in pixels
+        :param screen_height: Screen height in pixels
+        """
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.top_taskbar_h = 180
@@ -42,8 +49,11 @@ class Game:
         self.console = Console(grid, 600, CONSOLE_CONFIG)
         self.console.toggle()
 
-
     def draw(self):
+        """
+        Draws the object symbols and blits them onto the window
+        :return: None
+        """
         self.font = pygame.font.SysFont('cambriacambriamath', 20)
         for x in range(grid.width):
             for y in range(grid.height):
@@ -59,11 +69,22 @@ class Game:
 
     @staticmethod
     def clear_grid():
+        """
+        Places an Empty() object on each square
+        :return: None
+        """
         for x in range(grid.width):
             for y in range(grid.height):
                 grid.place_object_f((x, y), objects.Empty())
 
     def display_inventory(self, inv_):
+        """
+        Displays symbols of items from the player's inventory on the
+        top of the screen
+        :param inv_: Inventory of the player
+        :type inv_: list
+        :return: None
+        """
         inv = inv_ + [None for _ in range(len(self.item_boxes) - len(inv_))]
         self.font = pygame.font.SysFont('couriernew', 30)
         self.inv_box.fill(Colors.WHITE)
@@ -79,6 +100,18 @@ class Game:
 
     @staticmethod
     def place_from_map(_map, code):
+        """
+        Places objects onto the grid using a string pattern
+        :param _map: A tuple of strings of equal length. Each character represents
+        an object, each string represents a row.
+        :type _map: tuple
+        :param code: A dictionary of {char: Object()} or {char: name} pairs, which
+        defines the meaning of the characters in _map strings. If {char: Object()}
+        is passed, the char should only be used once. {char: name} places an object
+        with a given name.
+        :type code: dict
+        :return: None
+        """
         for y, row in enumerate(_map):
             for x, char in enumerate(row):
                 ref = code[char]
@@ -86,6 +119,12 @@ class Game:
                 grid.place_object((x, y), obj)
 
     def tick(self, delay):
+        """
+        Main loop function which handles PyGame Events, processes objects on the
+        grid, and displays the symbols on the screen.
+        :param delay: Duration of one tick
+        :return: None
+        """
         pygame.time.delay(delay)
 
         events = pygame.event.get()
