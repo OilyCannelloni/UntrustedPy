@@ -3,13 +3,13 @@ from constants import *
 
 class Grid:
     """
-    This class resembles the game grid and stores objects on its fields.
+    This class resembles the game grid and stores objects on its squares.
     Also contains methods which manipulate those objects
     """
     def __init__(self, width=10, height=10):
         """
-        :param width: Width of the grid in fields
-        :param height: Height of the grid in fields
+        :param width: Width of the grid in squares
+        :param height: Height of the grid in squares
         """
         # TODO add config file for those
         self.field_width = 20
@@ -28,7 +28,7 @@ class Grid:
     def get(self, coords):
         """
         Returns the object placed on given coordinates of grid
-        :param coords: (x, y) coordinates of the field
+        :param coords: (x, y) coordinates of the square
         :type coords: tuple
         :return: Object on (x, y) coordinates
         """
@@ -59,17 +59,36 @@ class Grid:
         return self.match(**kwargs)[0]
 
     def swap(self, c1, c2):
+        """
+        Swaps objects between two given squares
+        :param c1: Coordinates of the first square
+        :param c2: Coordinates of the second square
+        :return: None
+        """
         temp = self.get(c1)
         self.place_object_f(c1, self.get(c2))
         self.place_object_f(c2, temp)
 
     def push(self, c1, c2):
+        """
+        Moves object to a target square, while managing stacking
+        :param c1: Coordinates of the moved object
+        :param c2: Coordinates of the target square
+        :return: None
+        """
         new_stack = self.get(c2)
         self.place_object_f(c2, self.get(c1))
         self.place_object_f(c1, self.get(c1).stacked)
         self.get(c2).stacked = new_stack
 
     def move(self, crd, direction):
+        """
+        Moves object to one of its adjacent squares.
+        :param crd: Coordinates of the moved object
+        :param direction: Direction of movement: "up", "right", "left", "down"
+        :type direction: str
+        :return: False if movement exceeds the grid, True otherwise.
+        """
         x, y = crd
         if direction == "right":
             if x+1 > self.width:
@@ -87,21 +106,49 @@ class Grid:
             if x-1 < 0:
                 return False
             self.push((x, y), (x-1, y))
+        return True
 
     def place_object(self, crd, obj):
+        """
+        Places an object at a given square. Does not replace objects flagged with
+        obj.replacable = False.
+        :param crd: Coordinates of the square in format (x, y).
+        :type crd: tuple
+        :param obj: Object to be placed.
+        :return: False if object cannot be placed, True otherwise.
+        """
         if self.get(crd) is None or self.get(crd).replacable:
             self.grid[crd[0]][crd[1]] = obj
+            return True
+        return False
 
     def place_object_f(self, crd, obj):
+        """
+        Places an object on a given square. Forces replacement of objects flagged with
+        obj.replacable = False.
+        :param crd: Coordinates of the square in format (x, y)
+        :type crd: tuple
+        :param obj: Object to be placed
+        :return: None
+        """
         self.grid[crd[0]][crd[1]] = obj
 
     def get_player(self):
+        """
+        Returns the player object.
+        :return: Player object
+        """
         for col in self.grid:
             for entity in col:
                 if entity.type == Type.PLAYER:
                     return entity
 
     def get_dynamic_objects(self):
+        """
+        Returns a list of (x, y) coordinates of all dynamic objects
+        on the grid
+        :return: A list of (x, y) coordinates of all dynamic objects on the grid
+        """
         for x, col in enumerate(self.grid):
             for y, obj in enumerate(col):
                 if obj.type == Type.DYNAMIC:
