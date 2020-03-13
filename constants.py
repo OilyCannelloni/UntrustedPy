@@ -1,4 +1,12 @@
+"""
+This file contains some numerical constants
+"""
+
+
 class Keys:
+    """
+    PyGame arrow key id's
+    """
     UP = 273
     DOWN = 274
     RIGHT = 275
@@ -6,6 +14,9 @@ class Keys:
 
 
 class Colors:
+    """
+    RGB colors
+    """
     BLACK = (0, 0, 0)
     D_GRAY = (10, 10, 10)
     MD_GRAY = (30, 30, 30)
@@ -22,11 +33,17 @@ class Colors:
 
 
 class Events:
+    """
+    Custom PyGame Events
+    """
     LEVEL = 25
     CONSOLE_TOGGLE = 26
 
 
 class Type:
+    """
+    Object types
+    """
     STATIC = 0
     DYNAMIC = 1
     PLAYER = 2

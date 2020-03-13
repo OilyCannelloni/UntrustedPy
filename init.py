@@ -1,15 +1,21 @@
+"""
+This file contains the Game class, which manipulates elements
+of the grid. Run this file to initialize the game.
+"""
+
+import pygame
 import objects
 from objects import grid
-from constants import *
+from constants import Colors, Events
 from config import CONSOLE_CONFIG
 from libs.pygame_console.game_console import Console
-import pygame
 
 
 class Game:
     """
     Main class which manipulates all game events
     """
+
     def __init__(self, screen_width=1200, screen_height=900):
         """
         :param screen_width: Screen width in pixels
@@ -62,7 +68,8 @@ class Game:
                 col = obj.color if obj is not None else Colors.ORANGE
                 char = self.font.render(sym, True, col)
                 char_rect = char.get_rect()
-                char_rect.center = (x*grid.field_width+grid.MARGIN_LEFT, y*grid.field_height+grid.MARGIN_TOP)
+                char_rect.center = (x * grid.field_width + grid.margin_left,
+                                    y * grid.field_height + grid.margin_top)
                 self.game_surf.blit(char, char_rect)
 
         self.window.blit(self.game_surf, (0, self.top_taskbar_h))
@@ -115,7 +122,7 @@ class Game:
         for y, row in enumerate(_map):
             for x, char in enumerate(row):
                 ref = code[char]
-                obj = objects.__dict__[ref]() if type(ref) == str else ref
+                obj = objects.__dict__[ref]() if isinstance(ref, str) else ref
                 grid.place_object((x, y), obj)
 
     def tick(self, delay):
@@ -162,6 +169,10 @@ class Game:
         pygame.display.update()
 
     def level1(self):
+        """
+        Level 1
+        :return: None
+        """
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -171,16 +182,21 @@ class Game:
                              ".#......#.",
                              ".#.....e#.",
                              ".########.",
-                             ".........."), {
-            ".": 'Empty',
-            "#": 'Wall',
-            "p": objects.Player(),
-            "k": objects.SmallKey(),
-            "d": objects.KeyDoor(key_name="small_key"),
-            "e": objects.Exit(target_level="level2")
-        })
+                             ".........."),
+                            {
+                                ".": 'Empty',
+                                "#": 'Wall',
+                                "p": objects.Player(),
+                                "k": objects.SmallKey(),
+                                "d": objects.KeyDoor(key_name="small_key"),
+                                "e": objects.Exit(target_level="level2")
+                            })
 
     def level2(self):
+        """
+        Level 2
+        :return: None
+        """
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -192,18 +208,23 @@ class Game:
                              ".#......#.",
                              ".#....e.#.",
                              ".########.",
-                             ".........."), {
-            ".": 'Empty',
-            "#": 'Wall',
-            "p": 'Player',
-            "k": objects.SmallKey(color=(255, 0, 0)),
-            "l": objects.SmallKey(color=(0, 255, 0)),
-            "m": objects.SmallKey(color=(0, 0, 255)),
-            "d": objects.ColoredDoor(color=(0, 0, 255)),
-            "e": objects.Exit(target_level="level3")
-        })
+                             ".........."),
+                            {
+                                ".": 'Empty',
+                                "#": 'Wall',
+                                "p": 'Player',
+                                "k": objects.SmallKey(color=(255, 0, 0)),
+                                "l": objects.SmallKey(color=(0, 255, 0)),
+                                "m": objects.SmallKey(color=(0, 0, 255)),
+                                "d": objects.ColoredDoor(color=(0, 0, 255)),
+                                "e": objects.Exit(target_level="level3")
+                            })
 
     def level3(self):
+        """
+        Level 3
+        :return: None
+        """
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -215,19 +236,26 @@ class Game:
                              ".#......#.",
                              ".#....e.#.",
                              ".########.",
-                             ".........."), {
+                             ".........."),
+                            {
                                 ".": 'Empty',
                                 "#": 'Wall',
                                 "p": 'Player',
                                 "k": objects.SmallKey(color=Colors.YELLOW),
                                 "l": objects.SmallKey(color=Colors.SCARLET),
                                 "m": objects.SmallKey(color=Colors.NAVY),
-                                "d": objects.ChangingColoredDoor(color_queue=(Colors.RED, Colors.AQUA, Colors.ORANGE,
-                                                                  Colors.MAGENTA, Colors.YELLOW, Colors.BLUE)),
+                                "d": objects.ChangingColoredDoor(
+                                    color_queue=(Colors.RED, Colors.AQUA,
+                                                 Colors.ORANGE, Colors.MAGENTA,
+                                                 Colors.YELLOW, Colors.BLUE)),
                                 "e": objects.Exit(target_level="level4")
                             })
 
     def level4(self):
+        """
+        Level 4
+        :return: None
+        """
         self.clear_grid()
         self.place_from_map(("....................",
                              ".##################.",
@@ -248,17 +276,23 @@ class Game:
                              ".#.#...........d..#.",
                              ".#.#..............#.",
                              ".##################.",
-                             "...................."), {
-            ".": "Empty",
-            "#": "Wall",
-            "p": "Player",
-            "x": objects.ColoredDoor(color=Colors.ORANGE),
-            "e": objects.Exit(target_level="level5"),
-            "d": objects.AllyDrone(inventory=[objects.SmallKey(color=Colors.ORANGE)]),
-            "D": objects.ColoredDoor(color=Colors.ORANGE)
-        })
+                             "...................."),
+                            {
+                                ".": "Empty",
+                                "#": "Wall",
+                                "p": "Player",
+                                "x": objects.ColoredDoor(color=Colors.ORANGE),
+                                "e": objects.Exit(target_level="level5"),
+                                "d": objects.AllyDrone(inventory=[objects.SmallKey(
+                                    color=Colors.ORANGE)]),
+                                "D": objects.ColoredDoor(color=Colors.ORANGE)
+                            })
 
     def level5(self):
+        """
+        Level 5
+        :return: None
+        """
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -268,7 +302,8 @@ class Game:
                              ".#......#.",
                              ".#.....e#.",
                              ".########.",
-                             ".........."), {
+                             ".........."),
+                            {
                                 ".": 'Empty',
                                 "#": 'Wall',
                                 "p": objects.Player(),

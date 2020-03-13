@@ -1,11 +1,18 @@
+"""
+This file contains definitions of all objects used in the game
+"""
+import pygame.event
 from constants import *
 from grid import Grid
-import pygame.event
+
 
 grid = Grid(30, 30)
 
 
 class Object:
+    """
+    This class contains methods characteristic for every object
+    """
     def __init__(self):
         self.id = grid.id_counter  # A unique id for each object
         grid.id_counter += 1
@@ -13,18 +20,23 @@ class Object:
         self.stacked = None
         self.replacable = False
         self.hackable = []
+        self.name = None
 
     def set(self, **kwargs):
+        """
+        Sets given atributes to given values
+        :param kwargs: Attribute=value pairs
+        :return: None
+        """
         for arg, val in kwargs.items():
             setattr(self, arg, val)
 
-    def behavior(self, keys_down):
+    def behavior(self, key):
         """
         This function is executed each game tick for each dynamic object
-        :param keys_down: Pressed keys detected by PyGame
+        :param key: Pressed keys detected by PyGame
         :return:
         """
-        pass
 
     def get_coords(self):
         """
@@ -46,17 +58,17 @@ class Object:
             'up': (self.coords[0], self.coords[1]-1)
         }
 
-    def move(self, d):
+    def move(self, direction):
         """
         Moves the object in target direction
-        :param d: Direction "up", "right", "down", "left"
+        :param direction: Direction "up", "right", "down", "left"
         :return: True if movement was successful, False otherwise
         """
-        dest = grid.get(self.get_adjacent()[d])
+        dest = grid.get(self.get_adjacent()[direction])
         self.on_collision_with(dest)
         dest.on_collision_with(self)
         if dest.passable_for == 'all' or self.name in dest.passable_for:
-            return grid.move(self.coords, d)
+            return grid.move(self.coords, direction)
         return False
 
     def has(self, item):
@@ -65,7 +77,6 @@ class Object:
         :param item: Item to be checked
         :return: True if the object has the item, False othewise
         """
-        pass
 
     def on_collision_with(self, collider):
         """
@@ -74,21 +85,26 @@ class Object:
         :param collider: Colliding object
         :return: None
         """
-        pass
 
 
 class Item(Object):
+    """
+    This class defines methods for pickable items
+    """
     def __init__(self, **kwargs):
         super().__init__()
         super().set(**kwargs)
 
-        def on_collision_with(self, collider):
-            if collider.name == "player":
-                if grid.get_player().push_inventory(self):
-                    grid.place_object_f(self.get_coords(), Empty())
+    def on_collision_with(self, collider):
+        if collider.name == "player":
+            if grid.get_player().push_inventory(self):
+                grid.place_object_f(self.get_coords(), Empty())
 
 
 class Empty(Object):
+    """
+    Idle object passable for everything
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = 'empty'
@@ -101,6 +117,9 @@ class Empty(Object):
 
 
 class Player(Object):
+    """
+    The object which is controlled by the player
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = 'player'
@@ -123,9 +142,8 @@ class Player(Object):
         if len(self.inventory) < self.max_inventory_size:
             self.inventory.append(item)
             return True
-        else:
-            print("inventory full!")
-            return False
+        print("inventory full!")
+        return False
 
     def has(self, item):
         return item in [it.name for it in self.inventory]
@@ -144,6 +162,9 @@ class Player(Object):
 
 
 class Wall(Object):
+    """
+    Basic impassable object
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = 'wall'
@@ -155,6 +176,10 @@ class Wall(Object):
 
 
 class FluxBarrier(Object):
+    """
+    Object which removes given items from all entities
+    which pass through it
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "flux_barrier"
@@ -170,6 +195,10 @@ class FluxBarrier(Object):
 
 
 class Exit(Object):
+    """
+    Object which generates another map (level) after
+    collision with player
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "exit"
@@ -186,6 +215,10 @@ class Exit(Object):
 
 
 class KeyDoor(Object):
+    """
+    Object passable for all entities having an item
+    with a given name in their inventory
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "key_door"
@@ -204,6 +237,10 @@ class KeyDoor(Object):
 
 
 class ColoredDoor(Object):
+    """
+    Object passsable for all entities that have an item with given
+    name and color in their inventory
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "colored_door"
@@ -223,18 +260,25 @@ class ColoredDoor(Object):
 
 
 class ChangingColoredDoor(ColoredDoor):
+    """
+    ColoredDoor which change color every tick along
+    a given queue
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.color_queue = [Colors.WHITE, Colors.GREEN, Colors.RED]
         self.color_index = 0
         super().set(**kwargs)
 
-    def behavior(self, keys_down):
+    def behavior(self, key):
         self.color_index = (self.color_index + 1) % len(self.color_queue)
         self.color = self.color_queue[self.color_index]
 
 
 class SmallKey(Object):
+    """
+    A key used to open doors
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "small_key"
@@ -244,7 +288,6 @@ class SmallKey(Object):
         self.color = Colors.WHITE
         super().set(**kwargs)
 
-
     def on_collision_with(self, collider):
         if collider.name == "player":
             if grid.get_player().push_inventory(self):
@@ -252,6 +295,11 @@ class SmallKey(Object):
 
 
 class AllyDrone(Object):
+    """
+    An object which moves towards the player on each tick
+    and has an inventory for items. It drops the items upon
+    collision with player
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "ally_drone"
@@ -270,21 +318,18 @@ class AllyDrone(Object):
         :param dest_coords: Target (x, y) coordinates
         :return:
         """
-        coords = self.get_coords()
-        dx = coords[0] - dest_coords[0]
-        dy = coords[1] - dest_coords[1]
-        if abs(dx) > abs(dy):
-            if coords[0] > dest_coords[0]:
+        coordinates = self.get_coords()
+        delta_x = coordinates[0] - dest_coords[0]
+        delta_y = coordinates[1] - dest_coords[1]
+        if abs(delta_x) > abs(delta_y):
+            if coordinates[0] > dest_coords[0]:
                 return self.move("left")
-            else:
-                return self.move("right")
-        else:
-            if coords[1] > dest_coords[1]:
-                return self.move("up")
-            else:
-                return self.move("down")
+            return self.move("right")
+        if coordinates[1] > dest_coords[1]:
+            return self.move("up")
+        return self.move("down")
 
-    def behavior(self, keys_down):
+    def behavior(self, key):
         self.move_towards(grid.match(name="player")[0])
 
     def on_collision_with(self, collider):
@@ -297,6 +342,10 @@ class AllyDrone(Object):
 
 
 class Computer(Object):
+    """
+    Object which, after being picked up, enables
+    the player to use the console
+    """
     def __init__(self, **kwargs):
         super().__init__()
         self.name = "computer"
@@ -317,4 +366,8 @@ class Computer(Object):
 
     @staticmethod
     def on_pickup():
+        """
+        Triggers when the item is picked up by the player
+        :return: None
+        """
         pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": True}))

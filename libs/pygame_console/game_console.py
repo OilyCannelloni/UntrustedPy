@@ -67,11 +67,13 @@ class Padding(tuple):
 		self.left = padding[2] if len(padding) > 2 else 0
 		self.right = padding[3] if len(padding) > 3 else 0
 
+
 class CommandLineProcessor(cmd.Cmd):
-	''' Class implementing the logic behind console commands.
+	"""
+	Class implementing the logic behind console commands.
 	Code was taken, modified and adjsuted from original Tuxemon game 
 	https://github.com/Tuxemon/Tuxemon
-	'''
+	"""
 
 	def __init__(self, app, input=sys.stdin, output=sys.stdout):
 		''' Inherit from Cmd class. Output will need to be redirected 

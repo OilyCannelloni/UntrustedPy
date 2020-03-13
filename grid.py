@@ -1,4 +1,8 @@
-from constants import *
+"""
+This file contains the Grid class
+"""
+
+from constants import Type
 
 
 class Grid:
@@ -11,14 +15,13 @@ class Grid:
         :param width: Width of the grid in squares
         :param height: Height of the grid in squares
         """
-        # TODO add config file for those
         self.field_width = 20
         self.field_height = 20
         self.width = width
         self.height = height
 
-        self.MARGIN_LEFT = int(self.field_width/2 + 5)
-        self.MARGIN_TOP = int(self.field_height/2 + 5)
+        self.margin_left = int(self.field_width / 2 + 5)
+        self.margin_top = int(self.field_height/2 + 5)
 
         self.grid = [[None] * self.height for _ in range(self.width)]
         self.id_counter = 0
@@ -45,8 +48,8 @@ class Grid:
         ret = []
         for x, col in enumerate(self.grid):
             for y, obj in enumerate(col):
-                for k, v in kwargs.items():
-                    if getattr(obj, k) == v:
+                for key, value in kwargs.items():
+                    if getattr(obj, key) == value:
                         ret.append((x, y))
         return ret
 
@@ -58,28 +61,28 @@ class Grid:
         """
         return self.match(**kwargs)[0]
 
-    def swap(self, c1, c2):
+    def swap(self, coords_1, coords_2):
         """
         Swaps objects between two given squares
-        :param c1: Coordinates of the first square
-        :param c2: Coordinates of the second square
+        :param coords_1: Coordinates of the first square
+        :param coords_2: Coordinates of the second square
         :return: None
         """
-        temp = self.get(c1)
-        self.place_object_f(c1, self.get(c2))
-        self.place_object_f(c2, temp)
+        temp = self.get(coords_1)
+        self.place_object_f(coords_1, self.get(coords_2))
+        self.place_object_f(coords_2, temp)
 
-    def push(self, c1, c2):
+    def push(self, coords_1, coords_2):
         """
         Moves object to a target square, while managing stacking
-        :param c1: Coordinates of the moved object
-        :param c2: Coordinates of the target square
+        :param coords_1: Coordinates of the moved object
+        :param coords_2: Coordinates of the target square
         :return: None
         """
-        new_stack = self.get(c2)
-        self.place_object_f(c2, self.get(c1))
-        self.place_object_f(c1, self.get(c1).stacked)
-        self.get(c2).stacked = new_stack
+        new_stack = self.get(coords_2)
+        self.place_object_f(coords_2, self.get(coords_1))
+        self.place_object_f(coords_1, self.get(coords_1).stacked)
+        self.get(coords_2).stacked = new_stack
 
     def move(self, crd, direction):
         """
@@ -142,6 +145,7 @@ class Grid:
             for entity in col:
                 if entity.type == Type.PLAYER:
                     return entity
+        return None
 
     def get_dynamic_objects(self):
         """
