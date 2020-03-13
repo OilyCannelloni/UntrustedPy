@@ -1,4 +1,4 @@
-class keys:
+class Keys:
     UP = 273
     DOWN = 274
     RIGHT = 276

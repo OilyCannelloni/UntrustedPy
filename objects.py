@@ -7,7 +7,7 @@ grid = Grid(30, 30)
 
 class Object:
     def __init__(self):
-        self.id = grid.id_counter
+        self.id = grid.id_counter  # A unique id for each object
         grid.id_counter += 1
         self.coords = (None, None)
         self.name = None
@@ -15,9 +15,19 @@ class Object:
         self.replacable = False
 
     def behavior(self, keys_down):
+        """
+        This function is executed each game tick for each dynamic object
+        :param keys_down: Pressed keys detected by PyGame
+        :return:
+        """
         pass
 
     def get_coords(self):
+        """
+        Returns coordinates of the object
+        # TODO change this to grid.find()
+        :return: (x, y) coordinates of the object
+        """
         for x in range(grid.width):
             for y in range(grid.height):
                 obj = grid.grid[x][y]
@@ -27,6 +37,10 @@ class Object:
                     return x, y
 
     def get_adjacent(self):
+        """
+        Returns a dictionary of coordinates of adjacent squares
+        :return: dictionary of coordinates of adjacent squares
+        """
         self.coords = self.get_coords()
         return {
             'right': (self.coords[0]+1, self.coords[1]),
@@ -36,16 +50,33 @@ class Object:
         }
 
     def move(self, d):
+        """
+        Moves the object in target direction
+        :param d: Direction "up", "right", "down", "left"
+        :return: True if movement was successful, False otherwise
+        """
         dest = grid.get(self.get_adjacent()[d])
         self.on_collision_with(dest)
         dest.on_collision_with(self)
         if dest.passable_for == 'all' or self.name in dest.passable_for:
-            grid.move(self.coords, d)
+            return grid.move(self.coords, d)
+        return False
 
     def has(self, item):
+        """
+        Checks if an item is in the object's inventory
+        :param item: Item to be checked
+        :return: True if the object has the item, False othewise
+        """
         pass
 
     def on_collision_with(self, collider):
+        """
+        Triggers when the object is moved into another, or when
+        another object is moved into this object
+        :param collider: Colliding object
+        :return: None
+        """
         pass
 
 
@@ -73,6 +104,11 @@ class Player(Object):
         self.passable_for = []
 
     def push_inventory(self, item):
+        """
+        Places an object in player's inventory
+        :param item: Object to be placed
+        :return: True if successful, False otherwise
+        """
         if len(self.inventory) < self.max_inventory_size:
             self.inventory.append(item)
             return True
@@ -84,16 +120,16 @@ class Player(Object):
         return item in [it.name for it in self.inventory]
 
     def behavior(self, key):
-        if key == keys.LEFT:
+        if key == Keys.LEFT:
             self.move("right")
             self.symbol = "▶"
-        elif key == keys.RIGHT:
+        elif key == Keys.RIGHT:
             self.move("left")
             self.symbol = "◀"
-        elif key == keys.DOWN:
+        elif key == Keys.DOWN:
             self.move("down")
             self.symbol = "▼"
-        elif key == keys.UP:
+        elif key == Keys.UP:
             self.move("up")
             self.symbol = "▲"
 
@@ -210,25 +246,30 @@ class AllyDrone(Object):
         self.passable_for = ["player"]
 
     def move_towards(self, dest_coords):
+        """
+        Moves in the direction, which makes the object travel the most distance
+        towards the target
+        :param dest_coords: Target (x, y) coordinates
+        :return:
+        """
         coords = self.get_coords()
         dx = coords[0] - dest_coords[0]
         dy = coords[1] - dest_coords[1]
         if abs(dx) > abs(dy):
             if coords[0] > dest_coords[0]:
-                self.move("left")
+                return self.move("left")
             else:
-                self.move("right")
+                return self.move("right")
         else:
             if coords[1] > dest_coords[1]:
-                self.move("up")
+                return self.move("up")
             else:
-                self.move("down")
+                return self.move("down")
 
     def behavior(self, keys_down):
         self.move_towards(grid.match(name="player")[0])
 
     def on_collision_with(self, collider):
-        print("a", self.inventory, collider.name)
         if collider.name == "player":
             coords = self.get_coords()
             if len(self.inventory) > 0:
