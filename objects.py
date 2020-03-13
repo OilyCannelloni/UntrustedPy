@@ -37,6 +37,7 @@ class Object:
 
     def move(self, d):
         dest = grid.get(self.get_adjacent()[d])
+        self.on_collision_with(dest)
         dest.on_collision_with(self)
         if dest.passable_for == 'all' or self.name in dest.passable_for:
             grid.move(*self.coords, d)
@@ -69,6 +70,7 @@ class Player(Object):
         self.inventory = inv if inv is not None else []
         self.max_inventory_size = 3
         self.stacked = Empty()
+        self.passable_for = []
 
     def push_inventory(self, item):
         if len(self.inventory) < self.max_inventory_size:
@@ -203,6 +205,9 @@ class AllyDrone(Object):
         self.type = Type.DYNAMIC
         self.symbol = "⌘"
         self.color = Colors.GREEN
+        self.stacked = Empty()
+        self.inventory = inv if type(inv) == list else []
+        self.passable_for = ["player"]
 
     def move_towards(self, dest_coords):
         coords = self.get_coords()
@@ -220,4 +225,13 @@ class AllyDrone(Object):
                 self.move("down")
 
     def behavior(self, keys_down):
-        self.move_towards(grid.find(name="player"))
+        self.move_towards(grid.match(name="player")[0])
+
+    def on_collision_with(self, collider):
+        print("a", self.inventory, collider.name)
+        if collider.name == "player":
+            coords = self.get_coords()
+            if len(self.inventory) > 0:
+                grid.place_object_f(*coords, self.inventory[0])
+            else:
+                grid.place_object_f(*coords, Empty)

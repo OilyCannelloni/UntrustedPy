@@ -179,12 +179,43 @@ class Game:
                                 "m": objects.SmallKey(color=Colors.NAVY),
                                 "d": objects.ChangingColoredDoor((Colors.RED, Colors.AQUA, Colors.ORANGE,
                                                                   Colors.MAGENTA, Colors.YELLOW, Colors.BLUE)),
-                                "e": objects.Exit("level1")
+                                "e": objects.Exit("level4")
                             })
+
+    def level4(self):
+        self.clear_grid()
+        self.place_from_map(("....................",
+                             ".##################.",
+                             ".#.............x.e#.",
+                             ".#.p...........#..#.",
+                             ".#.............####.",
+                             ".#...########.....#.",
+                             ".#...D......#.....#.",
+                             ".#.#######..#.....#.",
+                             ".#.#.....#..#.....#.",
+                             ".#.#..#..#..#.....#.",
+                             ".#.#..#..#..#.....#.",
+                             ".#.#..#..#..#.....#.",
+                             ".#.#..#.....#.....#.",
+                             ".#.#..#######.....#.",
+                             ".###..#...........#.",
+                             ".#.#..#############.",
+                             ".#.#...........d..#.",
+                             ".#.#..............#.",
+                             ".##################.",
+                             "...................."), {
+            ".": "Empty",
+            "#": "Wall",
+            "p": "Player",
+            "x": objects.ColoredDoor(Colors.ORANGE),
+            "e": objects.Exit("level1"),
+            "d": objects.AllyDrone(inv=[objects.SmallKey(Colors.ORANGE)]),
+            "D": objects.ColoredDoor(Colors.ORANGE)
+        })
 
 
 if __name__ == "__main__":
     game = Game()
-    game.level1()
+    game.level4()
     while game.running:
         game.tick(30)
