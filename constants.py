@@ -30,5 +30,3 @@ class Type:
     STATIC = 0
     DYNAMIC = 1
     PLAYER = 2
-
-
