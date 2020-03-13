@@ -209,7 +209,6 @@ class CommandLineProcessor(cmd.Cmd):
 			if params is None or len(params) < 2:
 				raise Exception("ERROR: Missing argument")
 			if params[0] in obj.hackable:
-				print(params[1])
 				val = eval(params[1])
 				setattr(obj, params[0], val)
 				self.output.write("Success!")

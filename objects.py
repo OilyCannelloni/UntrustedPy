@@ -6,15 +6,15 @@ grid = Grid(30, 30)
 
 
 class Object:
-    def __init__(self, **kwargs):
+    def __init__(self):
         self.id = grid.id_counter  # A unique id for each object
         grid.id_counter += 1
         self.coords = (None, None)
-        self.name = None
         self.stacked = None
         self.replacable = False
         self.hackable = []
 
+    def set(self, **kwargs):
         for arg, val in kwargs.items():
             setattr(self, arg, val)
 
@@ -78,7 +78,7 @@ class Object:
 
 
 class Empty(Object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = 'empty'
         self.type = Type.STATIC
@@ -86,20 +86,22 @@ class Empty(Object):
         self.symbol = " "
         self.color = (255, 255, 255)
         self.replacable = True
+        super().set(**kwargs)
 
 
 class Player(Object):
-    def __init__(self, inv=None):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = 'player'
         self.type = Type.PLAYER
         self.symbol = '▲'
         self.looking_at = None
         self.color = (0, 255, 100)
-        self.inventory = inv if inv is not None else []
+        self.inventory = []
         self.max_inventory_size = 3
         self.stacked = Empty()
         self.passable_for = []
+        super().set(**kwargs)
 
     def push_inventory(self, item):
         """
@@ -131,38 +133,41 @@ class Player(Object):
 
 
 class Wall(Object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = 'wall'
         self.type = Type.STATIC
         self.symbol = '#'
         self.color = (255, 255, 255)
         self.passable_for = []
+        super().set(**kwargs)
 
 
 class FluxBarrier(Object):
-    def __init__(self, *items_removed):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = "flux_barrier"
         self.type = Type.DYNAMIC
         self.symbol = "⍂"
         self.color = (200, 100, 255)
         self.passable_for = "all"
-        self.items_removed = items_removed
+        self.items_removed = []
+        super().set(**kwargs)
 
     def on_collision_with(self, collider):
         collider.inventory = [item for item in collider.inventory if item not in self.items_removed]
 
 
 class Exit(Object):
-    def __init__(self, target_level):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = "exit"
         self.type = Type.DYNAMIC
         self.symbol = "⌼"
         self.color = (100, 100, 255)
         self.passable_for = ["player"]
-        self.target_level = target_level
+        self.target_level = "level1"
+        super().set(**kwargs)
 
     def on_collision_with(self, collider):
         if collider.name == "player":
@@ -170,31 +175,33 @@ class Exit(Object):
 
 
 class KeyDoor(Object):
-    def __init__(self, key_name):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = "key_door"
         self.type = Type.DYNAMIC
         self.symbol = "⌻"
         self.color = (255, 200, 100)
         self.passable_for = []
-        self.required_key_name = key_name
+        self.key_name = "small_key"
+        super().set(**kwargs)
 
     def on_collision_with(self, collider):
-        if collider.name == "player" and collider.has(self.required_key_name):
+        if collider.name == "player" and collider.has(self.key_name):
             self.passable_for.append("player")
         else:
             self.passable_for = []
 
 
 class ColoredDoor(Object):
-    def __init__(self, color=(255, 0, 0), key_name="small_key"):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = "colored_door"
         self.type = Type.DYNAMIC
         self.symbol = "⌻"
-        self.color = color
+        self.color = (255, 0, 0)
         self.passable_for = set()
-        self.required_key_name = key_name
+        self.required_key_name = "small_key"
+        super().set(**kwargs)
 
     def on_collision_with(self, collider):
         for item in collider.inventory:
@@ -205,10 +212,11 @@ class ColoredDoor(Object):
 
 
 class ChangingColoredDoor(ColoredDoor):
-    def __init__(self, color_queue):
+    def __init__(self, **kwargs):
         super().__init__()
-        self.color_queue = color_queue
+        self.color_queue = [Colors.WHITE, Colors.GREEN, Colors.RED]
         self.color_index = 0
+        super().set(**kwargs)
 
     def behavior(self, keys_down):
         self.color_index = (self.color_index + 1) % len(self.color_queue)
@@ -217,11 +225,14 @@ class ChangingColoredDoor(ColoredDoor):
 
 class SmallKey(Object):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.name = "small_key"
         self.type = Type.STATIC
         self.symbol = 'k'
         self.passable_for = "all"
+        self.color = Colors.WHITE
+        super().set(**kwargs)
+
 
     def on_collision_with(self, collider):
         if collider.name == "player":
@@ -230,15 +241,16 @@ class SmallKey(Object):
 
 
 class AllyDrone(Object):
-    def __init__(self, inv=None):
+    def __init__(self, **kwargs):
         super().__init__()
         self.name = "ally_drone"
         self.type = Type.DYNAMIC
         self.symbol = "⌘"
         self.color = Colors.GREEN
         self.stacked = Empty()
-        self.inventory = inv if type(inv) == list else []
+        self.inventory = []
         self.passable_for = ["player"]
+        super().set(**kwargs)
 
     def move_towards(self, dest_coords):
         """
@@ -275,12 +287,13 @@ class AllyDrone(Object):
 
 class Computer(Object):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__()
         self.name = "computer"
         self.type = Type.STATIC
         self.symbol = "@"
         self.color = Colors.WHITE
         self.passable_for = ["player"]
+        super().set(**kwargs)
 
         # Close the console on spawn, as the player has no computer
         pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": False}))

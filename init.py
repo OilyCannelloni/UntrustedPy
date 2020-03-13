@@ -176,8 +176,8 @@ class Game:
             "#": 'Wall',
             "p": objects.Player(),
             "k": objects.SmallKey(),
-            "d": objects.KeyDoor("small_key"),
-            "e": objects.Exit("level2")
+            "d": objects.KeyDoor(key_name="small_key"),
+            "e": objects.Exit(target_level="level2")
         })
 
     def level2(self):
@@ -200,7 +200,7 @@ class Game:
             "l": objects.SmallKey(color=(0, 255, 0)),
             "m": objects.SmallKey(color=(0, 0, 255)),
             "d": objects.ColoredDoor(color=(0, 0, 255)),
-            "e": objects.Exit("level3")
+            "e": objects.Exit(target_level="level3")
         })
 
     def level3(self):
@@ -222,9 +222,9 @@ class Game:
                                 "k": objects.SmallKey(color=Colors.YELLOW),
                                 "l": objects.SmallKey(color=Colors.SCARLET),
                                 "m": objects.SmallKey(color=Colors.NAVY),
-                                "d": objects.ChangingColoredDoor((Colors.RED, Colors.AQUA, Colors.ORANGE,
+                                "d": objects.ChangingColoredDoor(color_queue=(Colors.RED, Colors.AQUA, Colors.ORANGE,
                                                                   Colors.MAGENTA, Colors.YELLOW, Colors.BLUE)),
-                                "e": objects.Exit("level4")
+                                "e": objects.Exit(target_level="level4")
                             })
 
     def level4(self):
@@ -252,10 +252,10 @@ class Game:
             ".": "Empty",
             "#": "Wall",
             "p": "Player",
-            "x": objects.ColoredDoor(Colors.ORANGE),
-            "e": objects.Exit("level5"),
-            "d": objects.AllyDrone(inv=[objects.SmallKey(Colors.ORANGE)]),
-            "D": objects.ColoredDoor(Colors.ORANGE)
+            "x": objects.ColoredDoor(color=Colors.ORANGE),
+            "e": objects.Exit(target_level="level5"),
+            "d": objects.AllyDrone(inventory=[objects.SmallKey(color=Colors.ORANGE)]),
+            "D": objects.ColoredDoor(color=Colors.ORANGE)
         })
 
     def level5(self):
@@ -274,7 +274,7 @@ class Game:
                                 "p": objects.Player(),
                                 "k": objects.SmallKey(color=Colors.AQUA, hackable=['color']),
                                 "d": objects.ColoredDoor(color=Colors.GREEN),
-                                "e": objects.Exit("level1"),
+                                "e": objects.Exit(target_level="level1"),
                                 "c": objects.Computer()
                             })
 
