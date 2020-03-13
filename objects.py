@@ -28,13 +28,7 @@ class Object:
         # TODO change this to grid.find()
         :return: (x, y) coordinates of the object
         """
-        for x in range(grid.width):
-            for y in range(grid.height):
-                obj = grid.grid[x][y]
-                if obj is None:
-                    continue
-                if obj.id == self.id:
-                    return x, y
+        return grid.find(id=self.id)
 
     def get_adjacent(self):
         """
@@ -204,8 +198,8 @@ class ColoredDoor(Object):
         for item in collider.inventory:
             if item.name == self.required_key_name and item.color == self.color:
                 self.passable_for.add(collider.name)
-            else:
-                self.passable_for.discard(collider.name)
+                return
+        self.passable_for.discard(collider.name)
 
 
 class ChangingColoredDoor(ColoredDoor):
