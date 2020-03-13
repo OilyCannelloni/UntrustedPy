@@ -83,9 +83,9 @@ class Item(Object):
         super().set(**kwargs)
 
         def on_collision_with(self, collider):
-        if collider.name == "player":
-            if grid.get_player().push_inventory(self):
-                grid.place_object_f(self.get_coords(), Empty())
+            if collider.name == "player":
+                if grid.get_player().push_inventory(self):
+                    grid.place_object_f(self.get_coords(), Empty())
 
 
 class Empty(Object):
