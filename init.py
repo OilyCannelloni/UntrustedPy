@@ -1,6 +1,6 @@
 import objects
 from objects import grid
-from constants import Colors, Events
+from constants import *
 from config import CONSOLE_CONFIG
 from libs.pygame_console.game_console import Console
 import pygame
@@ -98,15 +98,19 @@ class Game:
                 p.behavior(event.key)
                 self.display_inventory(p.inventory)
 
+                for col in grid.grid:
+                    for obj in col:
+                        if obj.type == Type.DYNAMIC:
+                            obj.behavior(event.key)
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_F1:
                     self.console.toggle()
 
             if event.type == Events.LEVEL:
-                print(event.target)
                 getattr(self, event.target)()
 
-        self.game_surf.fill((0, 0, 0))
+        self.game_surf.fill(Colors.BLACK)
         self.draw()
 
         self.console.update(events)
@@ -116,30 +120,18 @@ class Game:
 
     def level1(self):
         self.clear_grid()
-        self.place_from_map(("....................",
-                             ".##################.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#....p......k....#.",
-                             ".#................#.",
-                             ".########d#########.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#.......e........#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".#................#.",
-                             ".##################.",
-                             "...................."
-                             ), {
+        self.place_from_map(("..........",
+                             ".########.",
+                             ".#p.....#.",
+                             ".#.....k#.",
+                             ".####d###.",
+                             ".#......#.",
+                             ".#.....e#.",
+                             ".########.",
+                             ".........."), {
             ".": 'Empty',
             "#": 'Wall',
-            "p": 'Player',
+            "p": objects.Player(),
             "k": objects.SmallKey(),
             "d": objects.KeyDoor("small_key"),
             "e": objects.Exit("level2")
@@ -151,6 +143,8 @@ class Game:
                              ".########.",
                              ".#.p....#.",
                              ".#....k.#.",
+                             ".#....m.#.",
+                             ".#....l.#.",
                              ".###d####.",
                              ".#......#.",
                              ".#....e.#.",
@@ -159,10 +153,36 @@ class Game:
             ".": 'Empty',
             "#": 'Wall',
             "p": 'Player',
-            "k": objects.SmallKey(),
-            "d": objects.KeyDoor("small_key"),
-            "e": objects.Exit("level1")
+            "k": objects.SmallKey(color=(255, 0, 0)),
+            "l": objects.SmallKey(color=(0, 255, 0)),
+            "m": objects.SmallKey(color=(0, 0, 255)),
+            "d": objects.ColoredDoor(color=(0, 0, 255)),
+            "e": objects.Exit("level3")
         })
+
+    def level3(self):
+        self.clear_grid()
+        self.place_from_map(("..........",
+                             ".########.",
+                             ".#.p....#.",
+                             ".#....k.#.",
+                             ".#....m.#.",
+                             ".#....l.#.",
+                             ".###d####.",
+                             ".#......#.",
+                             ".#....e.#.",
+                             ".########.",
+                             ".........."), {
+                                ".": 'Empty',
+                                "#": 'Wall',
+                                "p": 'Player',
+                                "k": objects.SmallKey(color=Colors.YELLOW),
+                                "l": objects.SmallKey(color=Colors.SCARLET),
+                                "m": objects.SmallKey(color=Colors.NAVY),
+                                "d": objects.ChangingColoredDoor((Colors.RED, Colors.AQUA, Colors.ORANGE,
+                                                                  Colors.MAGENTA, Colors.YELLOW, Colors.BLUE)),
+                                "e": objects.Exit("level1")
+                            })
 
 
 if __name__ == "__main__":

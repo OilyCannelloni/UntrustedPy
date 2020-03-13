@@ -1,4 +1,4 @@
-from constants import keys, Events
+from constants import *
 from grid import Grid
 import pygame.event
 
@@ -40,8 +40,6 @@ class Object:
         dest.on_collision_with(self)
         if dest.passable_for == 'all' or self.name in dest.passable_for:
             grid.move(*self.coords, d)
-        else:
-            print("cant move")
 
     def has(self, item):
         pass
@@ -54,7 +52,7 @@ class Empty(Object):
     def __init__(self):
         super().__init__()
         self.name = 'empty'
-        self.type = 'static'
+        self.type = Type.STATIC
         self.passable_for = 'all'
         self.symbol = " "
         self.color = (255, 255, 255)
@@ -62,13 +60,13 @@ class Empty(Object):
 
 
 class Player(Object):
-    def __init__(self):
+    def __init__(self, inv=None):
         super().__init__()
         self.name = 'player'
-        self.type = 'player'
+        self.type = Type.PLAYER
         self.symbol = '▲'
         self.color = (0, 255, 100)
-        self.inventory = []
+        self.inventory = inv if inv is not None else []
         self.max_inventory_size = 3
         self.stacked = Empty()
 
@@ -102,7 +100,7 @@ class Wall(Object):
     def __init__(self):
         super().__init__()
         self.name = 'wall'
-        self.type = 'static'
+        self.type = Type.STATIC
         self.symbol = '#'
         self.color = (255, 255, 255)
         self.passable_for = []
@@ -112,7 +110,7 @@ class FluxBarrier(Object):
     def __init__(self, *items_removed):
         super().__init__()
         self.name = "flux_barrier"
-        self.type = "dynamic"
+        self.type = Type.DYNAMIC
         self.symbol = "⍂"
         self.color = (200, 100, 255)
         self.passable_for = "all"
@@ -126,7 +124,7 @@ class Exit(Object):
     def __init__(self, target_level):
         super().__init__()
         self.name = "exit"
-        self.type = "dynamic"
+        self.type = Type.DYNAMIC
         self.symbol = "⌼"
         self.color = (100, 100, 255)
         self.passable_for = ["player"]
@@ -141,7 +139,7 @@ class KeyDoor(Object):
     def __init__(self, key_name):
         super().__init__()
         self.name = "key_door"
-        self.type = "dynamic"
+        self.type = Type.DYNAMIC
         self.symbol = "⌻"
         self.color = (255, 200, 100)
         self.passable_for = []
@@ -154,21 +152,45 @@ class KeyDoor(Object):
             self.passable_for = []
 
 
+class ColoredDoor(Object):
+    def __init__(self, color=(255, 0, 0), key_name="small_key"):
+        super().__init__()
+        self.name = "colored_door"
+        self.type = Type.DYNAMIC
+        self.symbol = "⌻"
+        self.color = color
+        self.passable_for = set()
+        self.required_key_name = key_name
+
+    def on_collision_with(self, collider):
+        for item in collider.inventory:
+            if item.name == self.required_key_name and item.color == self.color:
+                self.passable_for.add(collider.name)
+            else:
+                self.passable_for.discard(collider.name)
+
+
+class ChangingColoredDoor(ColoredDoor):
+    def __init__(self, color_queue):
+        super().__init__()
+        self.color_queue = color_queue
+        self.color_index = 0
+
+    def behavior(self, keys_down):
+        self.color_index = (self.color_index + 1) % len(self.color_queue)
+        self.color = self.color_queue[self.color_index]
+
+
 class SmallKey(Object):
-    def __init__(self):
+    def __init__(self, color=(255, 0, 0)):
         super().__init__()
         self.name = "small_key"
-        self.type = "item"
+        self.type = Type.STATIC
         self.symbol = 'k'
-        self.color = (255, 50, 50)
+        self.color = color
         self.passable_for = "all"
 
     def on_collision_with(self, collider):
         if collider.name == "player":
             if grid.get_player().push_inventory(self):
                 grid.place_object_f(*self.get_coords(), Empty())
-
-
-
-
-

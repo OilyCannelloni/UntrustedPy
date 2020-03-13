@@ -1,3 +1,4 @@
+from constants import *
 
 
 class Grid:
@@ -66,7 +67,7 @@ class Grid:
     def get_player(self):
         for col in self.grid:
             for entity in col:
-                if entity.type == 'player':
+                if entity.type == Type.PLAYER:
                     return entity
 
 
