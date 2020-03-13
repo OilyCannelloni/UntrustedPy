@@ -85,6 +85,7 @@ class CommandLineProcessor(cmd.Cmd):
 		self.output = output
 		self.input = input
 
+
 	def emptyline(self):
 		''' In case empty line is entered, nothing happens
 		'''
@@ -193,8 +194,27 @@ class CommandLineProcessor(cmd.Cmd):
 
 	def do_info(self, params):
 		try:
-			obj = self.app.get(self.app.get_player().get_adjacent()['left'])
+			player = self.app.get_player()
+			obj = self.app.get(player.looking_at)
 			self.output.write(obj.name)
+		except Exception as e:
+			self.output.write(str(e))
+			return -1
+
+	def do_hack(self, params):
+		try:
+			params = params.split()
+			player = self.app.get_player()
+			obj = self.app.get(player.looking_at)
+			if params is None or len(params) < 2:
+				raise Exception("ERROR: Missing argument")
+			if params[0] in obj.hackable:
+				print(params[1])
+				val = eval(params[1])
+				setattr(obj, params[0], val)
+				self.output.write("Success!")
+			else:
+				raise Exception(f"ERROR: Can't hack property {params[0]} \nof {obj.name} at {player.looking_at}")
 		except Exception as e:
 			self.output.write(str(e))
 			return -1
@@ -1192,6 +1212,7 @@ class Console(pygame.Surface):
 		# Initiace object for processing console commands - output of the class is redirected
 		# if console_output is not defined then standard output is used (sustem text console)
 		self.cli = CommandLineProcessor(self.app, output=self.console_output) if self.console_output else CommandLineProcessor(self.app)
+
 
 		# Correct the height dimension so that all the text rows are displayable
 		self.dim = (self.width, self.padding.up 

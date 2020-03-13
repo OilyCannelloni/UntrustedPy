@@ -216,12 +216,11 @@ class ChangingColoredDoor(ColoredDoor):
 
 
 class SmallKey(Object):
-    def __init__(self, color=(255, 0, 0)):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.name = "small_key"
         self.type = Type.STATIC
         self.symbol = 'k'
-        self.color = color
         self.passable_for = "all"
 
     def on_collision_with(self, collider):

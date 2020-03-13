@@ -272,8 +272,8 @@ class Game:
                                 ".": 'Empty',
                                 "#": 'Wall',
                                 "p": objects.Player(),
-                                "k": objects.SmallKey(),
-                                "d": objects.KeyDoor("small_key"),
+                                "k": objects.SmallKey(color=Colors.AQUA, hackable=['color']),
+                                "d": objects.ColoredDoor(color=Colors.GREEN),
                                 "e": objects.Exit("level1"),
                                 "c": objects.Computer()
                             })
@@ -281,6 +281,6 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.level1()
+    game.level5()
     while game.running:
         game.tick(30)
