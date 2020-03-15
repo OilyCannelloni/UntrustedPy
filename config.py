@@ -21,7 +21,7 @@ CONSOLE_CONFIG = {
         'bck_alpha': 120,
         'buffer_size': 100,
         'display_lines': 32,
-        'display_columns': 100,
+        'display_columns': 50,
         'line_spacing': None
     },
     'input': {

@@ -198,7 +198,7 @@ class CommandLineProcessor(cmd.Cmd):
 		try:
 			player = self.app.get_player()
 			obj = self.app.get(player.looking_at)
-			self.output.write(obj.name)
+			self.output.write(str(obj.__dict__))
 		except Exception as e:
 			self.output.write(str(e))
 			return -1

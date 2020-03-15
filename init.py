@@ -75,6 +75,14 @@ class Game:
         self.window.blit(self.game_surf, (0, self.top_taskbar_h))
 
     @staticmethod
+    def disable_console():
+        """
+        Closes the console
+        :return: None
+        """
+        pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": False}))
+
+    @staticmethod
     def clear_grid():
         """
         Places an Empty() object on each square
@@ -158,7 +166,7 @@ class Game:
                 if event.on:
                     self.console.enabled = True
                 else:
-                    self.console.enabled = False
+                    self.disable_console()
 
         self.game_surf.fill(Colors.BLACK)
         self.draw()
@@ -174,6 +182,7 @@ class Game:
         :return: None
         """
         self.clear_grid()
+        self.disable_console()
         self.place_from_map(("..........",
                              ".########.",
                              ".#p.....#.",
@@ -309,13 +318,44 @@ class Game:
                                 "p": objects.Player(),
                                 "k": objects.SmallKey(color=Colors.AQUA, hackable=['color']),
                                 "d": objects.ColoredDoor(color=Colors.GREEN),
-                                "e": objects.Exit(target_level="level1"),
+                                "e": objects.Exit(target_level="level6"),
+                                "c": objects.Computer()
+                            })
+
+    def level6(self):
+        """
+        Level 6
+        :return: None
+        """
+        self.clear_grid()
+        self.place_from_map(("..........",
+                             ".########.",
+                             ".#p.c...#.",
+                             ".#.....k#.",
+                             ".####d###.",
+                             ".#......#.",
+                             ".#......#.",
+                             ".####D###.",
+                             ".#......#.",
+                             ".#.....e#.",
+                             ".########.",
+                             ".........."),
+                            {
+                                ".": 'Empty',
+                                "#": 'Wall',
+                                "p": objects.Player(),
+                                "k": objects.SmallKey(color=Colors.AQUA, hackable=[]),
+                                "d": objects.ColoredDoor(color=Colors.SCARLET, hackable=['color']),
+                                "D": objects.ColoredDoor(color=Colors.AQUA,
+                                                         required_key_name="big_key",
+                                                         hackable=['required_key_name']),
+                                "e": objects.Exit(target_level="level6"),
                                 "c": objects.Computer()
                             })
 
 
 if __name__ == "__main__":
     game = Game()
-    game.level1()
+    game.level5()
     while game.running:
         game.tick(30)

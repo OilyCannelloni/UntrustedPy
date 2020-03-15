@@ -294,6 +294,25 @@ class SmallKey(Object):
                 grid.place_object_f(self.get_coords(), Empty())
 
 
+class BigKey(Object):
+    """
+    A key used to open doors
+    """
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.name = "big_key"
+        self.type = Type.STATIC
+        self.symbol = 'K'
+        self.passable_for = "all"
+        self.color = Colors.WHITE
+        super().set(**kwargs)
+
+    def on_collision_with(self, collider):
+        if collider.name == "player":
+            if grid.get_player().push_inventory(self):
+                grid.place_object_f(self.get_coords(), Empty())
+
+
 class AllyDrone(Object):
     """
     An object which moves towards the player on each tick
@@ -356,7 +375,7 @@ class Computer(Object):
         super().set(**kwargs)
 
         # Close the console on spawn, as the player has no computer
-        pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": False}))
+        # pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": False}))
 
     def on_collision_with(self, collider):
         if collider.name == "player":
