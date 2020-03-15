@@ -427,16 +427,10 @@ class MazeGenerator(Object):
     def draw_maze(self):
         for x in range(self.working_area[0][0], self.working_area[1][0]):
             for y in range(self.working_area[0][1], self.working_area[1][1]):
-                if (x, y) in self.path:
-                    grid.place_object_f((x, y), Empty)
-                    continue
-                obj = grid.get((x, y))
-                if obj.name == "player":
-                    continue
-                if random() < self.density:
+                if (x, y) not in self.path and random() < self.density:
                     grid.place_object_f((x, y), Wall)
-                else:
-                    grid.place_object_f((x, y), Empty)
+                    continue
+                grid.place_object_f((x, y), Empty)
 
     def behavior(self, key):
         if key == pygame.K_e and grid.find(name='player') in self.get_adjacent().values():
