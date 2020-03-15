@@ -142,6 +142,20 @@ class Grid:
         else:
             self.grid[crd[0]][crd[1]] = obj
 
+    @staticmethod
+    def get_adjacent(crd):
+        """
+        Returns the coordinates of all neighboring cells
+        :param crd: Coordinates of the point
+        :return: A dict of 'dir': coordinate pairs
+        """
+        return {
+            'right': (crd[0] + 1, crd[1]),
+            'left': (crd[0] - 1, crd[1]),
+            'down': (crd[0], crd[1] + 1),
+            'up': (crd[0], crd[1] - 1)
+        }
+
     def get_player(self):
         """
         Returns the player object.

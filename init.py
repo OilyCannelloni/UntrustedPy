@@ -16,7 +16,7 @@ class Game:
     Main class which manipulates all game events
     """
 
-    def __init__(self, screen_width=1200, screen_height=900):
+    def __init__(self, level=1, screen_width=1200, screen_height=900):
         """
         :param screen_width: Screen width in pixels
         :param screen_height: Screen height in pixels
@@ -54,6 +54,8 @@ class Game:
 
         self.console = Console(grid, 600, CONSOLE_CONFIG)
         # self.console.toggle()
+
+        self.level = level
 
     def draw(self):
         """
@@ -120,17 +122,23 @@ class Game:
         :param _map: A tuple of strings of equal length. Each character represents
         an object, each string represents a row.
         :type _map: tuple
-        :param code: A dictionary of {char: Object()} or {char: name} pairs, which
+        :param code: A dictionary of {char: Object()}, {char: prototype} or {char: name} pairs, which
         defines the meaning of the characters in _map strings. If {char: Object()}
         is passed, the char should only be used once. {char: name} places an object
-        with a given name.
+        with a given name. {char: prototype} places a new default instance of an object
         :type code: dict
         :return: None
         """
         for y, row in enumerate(_map):
             for x, char in enumerate(row):
                 ref = code[char]
-                obj = objects.__dict__[ref]() if isinstance(ref, str) else ref
+                obj = None
+                if isinstance(ref, str):
+                    obj = objects.__dict__[ref]()
+                elif isinstance(ref, type):
+                    obj = ref()
+                else:
+                    obj = ref
                 grid.place_object((x, y), obj)
 
     def tick(self, delay):
@@ -159,6 +167,9 @@ class Game:
                 if event.key == pygame.K_F1:
                     self.console.toggle()
 
+                if event.key == pygame.K_q:
+                    getattr(self, "level" + str(self.level))()
+
             if event.type == Events.LEVEL:
                 getattr(self, event.target)()
 
@@ -181,6 +192,7 @@ class Game:
         Level 1
         :return: None
         """
+        self.level = 1
         self.clear_grid()
         self.disable_console()
         self.place_from_map(("..........",
@@ -206,6 +218,7 @@ class Game:
         Level 2
         :return: None
         """
+        self.level = 2
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -234,6 +247,7 @@ class Game:
         Level 3
         :return: None
         """
+        self.level = 3
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -265,6 +279,7 @@ class Game:
         Level 4
         :return: None
         """
+        self.level = 4
         self.clear_grid()
         self.place_from_map(("....................",
                              ".##################.",
@@ -302,6 +317,7 @@ class Game:
         Level 5
         :return: None
         """
+        self.level = 5
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -327,6 +343,7 @@ class Game:
         Level 6
         :return: None
         """
+        self.level = 6
         self.clear_grid()
         self.place_from_map(("..........",
                              ".########.",
@@ -350,12 +367,53 @@ class Game:
                                                          required_key_name="big_key",
                                                          hackable=['required_key_name']),
                                 "e": objects.Exit(target_level="level6"),
-                                "c": objects.Computer()
+                                "c": objects.Computer(),
+                            })
+
+    def level7(self):
+        """
+        Level 7
+        :return: None
+        """
+        self.level = 7
+        self.clear_grid()
+        self.place_from_map((".........................",
+                             ".#######################.",
+                             ".#p.c..................#.",
+                             ".#....M................#.",
+                             ".##.####################.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#.....................#.",
+                             ".#....................e#.",
+                             ".#######################.",
+                             "........................."),
+                            {
+                                ".": 'Empty',
+                                "#": 'Wall',
+                                "p": objects.Player(),
+                                "e": objects.Exit(target_level="level6"),
+                                "c": objects.Computer(),
+                                "M": objects.MazeGenerator(working_area=((2, 5), (22, 17)),
+                                                           path_str=((3, 5), "ddrrddldddrrurdddrrrurrddllur"),
+                                                           density=0.8,
+                                                           hackable=['path_str'])
                             })
 
 
 if __name__ == "__main__":
-    game = Game()
-    game.level5()
+    game = Game(7)
+    getattr(game, "level"+str(game.level))()
     while game.running:
         game.tick(30)
