@@ -111,30 +111,36 @@ class Grid:
             self.push((x, y), (x-1, y))
         return True
 
-    def place_object(self, crd, obj):
+    def place_object(self, crd, obj, **kwargs):
         """
         Places an object at a given square. Does not replace objects flagged with
         obj.replacable = False.
         :param crd: Coordinates of the square in format (x, y).
         :type crd: tuple
         :param obj: Object to be placed.
+        :param kwargs: Object attributes if obj is a prototype
         :return: False if object cannot be placed, True otherwise.
         """
         if self.get(crd) is None or self.get(crd).replacable:
-            self.grid[crd[0]][crd[1]] = obj
+            self.place_object_f(crd, obj, **kwargs)
             return True
         return False
 
-    def place_object_f(self, crd, obj):
+    def place_object_f(self, crd, obj, **kwargs):
         """
         Places an object on a given square. Forces replacement of objects flagged with
-        obj.replacable = False.
+        obj.replacable = False. If the object is a class prototype, places a new instance
+        with kwargs instead.
         :param crd: Coordinates of the square in format (x, y)
         :type crd: tuple
         :param obj: Object to be placed
+        :param kwargs: Object attributes if obj is a prototype
         :return: None
         """
-        self.grid[crd[0]][crd[1]] = obj
+        if isinstance(obj, type):
+            self.grid[crd[0]][crd[1]] = obj(**kwargs)
+        else:
+            self.grid[crd[0]][crd[1]] = obj
 
     def get_player(self):
         """

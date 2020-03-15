@@ -390,3 +390,24 @@ class Computer(Object):
         :return: None
         """
         pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": True}))
+
+
+class MazeGenerator(Object):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.name = "maze_generator"
+        self.type = Type.DYNAMIC
+        self.symbol = "&"
+        self.color = Colors.ORANGE
+        self.passable_for = []
+        self.working_area = None
+        self.maze_block_name = "Wall"
+        super().set(**kwargs)
+
+    def behavior(self, key):
+        for x in range(self.working_area[0][0], self.working_area[1][0]):
+            for y in range(self.working_area[0][1], self.working_area[1][1]):
+                obj = grid.get((x, y))
+                if obj.name == "player":
+                    continue
+                grid.place_object_f((x, y), Wall)
