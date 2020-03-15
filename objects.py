@@ -403,10 +403,12 @@ class MazeGenerator(Object):
         self.passable_for = []
         self.working_area = ((0, 0), (0, 0))
         self.maze_block_name = "Wall"
+        self.path_str = ((0, 0), "")
         self.density = 0.9
         self.path = []
         super().set(**kwargs)
         self.build_path(*kwargs["path_str"])
+        self.draw_maze()
 
     def build_path(self, start, steps_str):
         dir_shorts = {
@@ -417,15 +419,16 @@ class MazeGenerator(Object):
         }
         steps = [dir_shorts[d] for d in steps_str]
         crd = start
-        self.path.append(start)
+        self.path = [start]
         for step in steps:
             crd = grid.get_adjacent(crd)[step]
             self.path.append(crd)
 
-    def behavior(self, key):
+    def draw_maze(self):
         for x in range(self.working_area[0][0], self.working_area[1][0]):
             for y in range(self.working_area[0][1], self.working_area[1][1]):
                 if (x, y) in self.path:
+                    grid.place_object_f((x, y), Empty)
                     continue
                 obj = grid.get((x, y))
                 if obj.name == "player":
@@ -434,4 +437,9 @@ class MazeGenerator(Object):
                     grid.place_object_f((x, y), Wall)
                 else:
                     grid.place_object_f((x, y), Empty)
+
+    def behavior(self, key):
+        if key == pygame.K_e and grid.find(name='player') in self.get_adjacent().values():
+            self.build_path(*self.path_str)
+            self.draw_maze()
 

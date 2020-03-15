@@ -405,8 +405,8 @@ class Game:
                                 "p": objects.Player(),
                                 "e": objects.Exit(target_level="level6"),
                                 "c": objects.Computer(),
-                                "M": objects.MazeGenerator(working_area=((2, 5), (22, 17)),
-                                                           path_str=((3, 5), "ddrrddldddrrurdddrrrurrddllur"),
+                                "M": objects.MazeGenerator(working_area=((2, 5), (23, 17)),
+                                                           path_str=((3, 5), "ddrrrrrdrrrurr"),
                                                            density=0.8,
                                                            hackable=['path_str'])
                             })
