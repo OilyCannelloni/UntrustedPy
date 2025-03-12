@@ -15,8 +15,8 @@ class Grid:
         :param width: Width of the grid in squares
         :param height: Height of the grid in squares
         """
-        self.field_width = 20
-        self.field_height = 20
+        self.field_width = 30
+        self.field_height = 30
         self.width = width
         self.height = height
 

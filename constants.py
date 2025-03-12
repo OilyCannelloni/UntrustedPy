@@ -2,6 +2,8 @@
 This file contains some numerical constants
 """
 
+import pygame
+
 
 class Keys:
     """
@@ -36,8 +38,8 @@ class Events:
     """
     Custom PyGame Events
     """
-    LEVEL = 25
-    CONSOLE_TOGGLE = 26
+    LEVEL = pygame.event.custom_type()
+    CONSOLE_TOGGLE = pygame.event.custom_type()
 
 
 class Type:

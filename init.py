@@ -62,7 +62,7 @@ class Game:
         Draws the object symbols and blits them onto the window
         :return: None
         """
-        self.font = pygame.font.SysFont('cambriacambriamath', 20)
+        self.font = pygame.font.SysFont('cambria', 30)
         for x in range(grid.width):
             for y in range(grid.height):
                 obj = grid.grid[x][y]
@@ -82,7 +82,9 @@ class Game:
         Closes the console
         :return: None
         """
-        pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": False}))
+        e = pygame.event.Event(Events.CONSOLE_TOGGLE, on=False)
+        e.dict['on'] = False
+        pygame.event.post(e)
 
     @staticmethod
     def clear_grid():
@@ -156,6 +158,7 @@ class Game:
                 self.running = False
 
             if event.type == pygame.KEYDOWN:
+                print(event.key)
                 p = grid.get_player()
                 p.behavior(event.key)
                 self.display_inventory(p.inventory)
@@ -171,10 +174,10 @@ class Game:
                     getattr(self, "level" + str(self.level))()
 
             if event.type == Events.LEVEL:
-                getattr(self, event.target)()
+                getattr(self, event.dict['target'])()
 
             if event.type == Events.CONSOLE_TOGGLE:
-                if event.on:
+                if event.dict['on']:
                     self.console.enabled = True
                 else:
                     self.disable_console()
@@ -413,7 +416,7 @@ class Game:
 
 
 if __name__ == "__main__":
-    game = Game(7)
+    game = Game(5)
     getattr(game, "level"+str(game.level))()
     while game.running:
         game.tick(30)

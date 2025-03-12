@@ -151,10 +151,10 @@ class Player(Object):
 
     def behavior(self, key):
         dirs = {
-            Keys.LEFT: ("left", "◀"),
-            Keys.RIGHT: ("right", "▶"),
-            Keys.UP: ("up", "▲"),
-            Keys.DOWN: ("down", "▼")
+            1073741904: ("left", "◀"),
+            1073741903: ("right", "▶"),
+            1073741906: ("up", "▲"),
+            1073741905: ("down", "▼")
         }
         if key in dirs.keys():
             self.move(dirs[key][0])
@@ -390,7 +390,8 @@ class Computer(Object):
         Triggers when the item is picked up by the player
         :return: None
         """
-        pygame.event.post(pygame.event.Event(Events.CONSOLE_TOGGLE, {"on": True}))
+        e = pygame.event.Event(Events.CONSOLE_TOGGLE, on=True)
+        pygame.event.post(e)
 
 
 class MazeGenerator(Object):
